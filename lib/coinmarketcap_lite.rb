@@ -4,6 +4,7 @@
 
 require 'net/http'
 require 'uri'
+require 'dynarex-password' # used by CoinmarketlitePlus
 
 
 class CoinmarketcapLite
@@ -36,7 +37,7 @@ class CoinmarketcapLite
 
   def get_map(symbols=[])
 
-    get_request('/map', "symbol" => symbols.map {|x| x.to_s.upcase})
+    get_request('/map?symbol=' + symbols.map {|x| x.to_s.upcase}).join(',')
 
   end
 
@@ -58,4 +59,33 @@ class CoinmarketcapLite
     end
 
   end
+end
+
+
+class CoinmarketcapLitePlus < CoinmarketcapLite
+  
+  def initialize(reg, debug: false)
+
+    @debug = debug
+    
+    key = 'hkey_apps/coinmarketcap'
+    e = reg.get_key(key)
+    @lookup_file = e.text('lookup_file').to_s
+    
+    apikey     = decipher(e.text('apikey').to_s)
+    
+    if @debug then
+      puts apikey.inspect 
+    end
+
+    super(apikey: apikey)
+
+  end
+  
+  private
+
+  def decipher(s)
+    DynarexPassword.new.reverse_lookup(s, @lookup_file)
+  end
+  
 end
