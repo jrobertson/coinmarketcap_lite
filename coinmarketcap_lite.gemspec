@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'coinmarketcap_lite'
-  s.version = '0.2.0'
+  s.version = '0.2.1'
   s.summary = 'Queries the CoinMarketCap API using your API key.' + 
       ' Returns the latest prices for the top 100 coins etc.'
   s.authors = ['James Robertson']

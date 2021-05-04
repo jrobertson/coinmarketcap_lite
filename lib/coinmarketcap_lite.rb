@@ -64,28 +64,29 @@ end
 
 class CoinmarketcapLitePlus < CoinmarketcapLite
   
-  def initialize(reg, debug: false)
+  def self.fetch_apikey(reg)
 
-    @debug = debug
+    decipher = ->(lookup_file, s) {
+      DynarexPassword.new.reverse_lookup(s, lookup_file)
+    }
     
     key = 'hkey_apps/coinmarketcap'
     e = reg.get_key(key)
-    @lookup_file = e.text('lookup_file').to_s
+    lookup_file = e.text('lookup_file').to_s
     
-    apikey     = decipher(e.text('apikey').to_s)
+    apikey = decipher.call(lookup_file, e.text('apikey').to_s)
     
-    if @debug then
-      puts apikey.inspect 
-    end
+  end  
+  
+  def initialize(reg, debug: false)
+
+    @debug = debug
+        
+    apikey = CoinmarketcapLitePlus.fetch_apikey(reg)
 
     super(apikey: apikey)
 
   end
   
-  private
-
-  def decipher(s)
-    DynarexPassword.new.reverse_lookup(s, @lookup_file)
-  end
   
 end
